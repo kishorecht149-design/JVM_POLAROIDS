@@ -358,6 +358,31 @@ html {
     }
 
 }
+    /* ===== FIX ALL BUTTONS PROPERLY ===== */
+
+.btn,
+.hero-buttons a,
+.collection a {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 320px;
+
+    margin: 15px auto;
+
+    padding: 14px 18px;
+
+    background: black;
+    color: white;
+    text-decoration: none;
+
+    border-radius: 14px;
+    font-size: 15px;
+
+    white-space: nowrap; /* 🔥 prevents breaking */
+}
 </style>
 
 
