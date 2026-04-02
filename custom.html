@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Order | JVM Polaroids</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 60px;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar a {
+    margin: 0 12px;
+    text-decoration: none;
+    color: #444;
+}
+
+.container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-radius: 15px;
+}
+
+input, select, textarea {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-dark {
+    background: black;
+    color: white;
+}
+
+/* QR POPUP */
+#paymentPopup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div>JVM Polaroids</div>
+    <div id="navRight">
+        <a href="index.html">Home</a>
+        <a href="anime.html">Polaroids</a>
+        <a href="custom.html">Custom</a>
+
+        <!-- 🔥 ADD THIS -->
+        <button id="loginBtn" onclick="loginUser()" style="margin-left:10px;padding:6px 12px;border:none;background:black;color:white;border-radius:6px;cursor:pointer;">
+            Sign Up
+        </button>
+    </div>
+</div>
+
+<div class="container">
+
+<h2>Customize Your Order !!</h2>
+
+<input type="text" id="name" placeholder="Your Name">
+<input type="tel" id="phone" placeholder="Phone Number">
+<textarea id="address" placeholder="Delivery Address"></textarea>
+
+<input type="number" id="imgCount" placeholder="How many images?" min="1" onchange="generateInputs()">
+
+<div id="dynamicInputs"></div>
+
+<textarea id="note" placeholder="Any special instructions..."></textarea>
+
+<button id="submitBtn" class="btn btn-dark" onclick="submitForm()">
+    Submit Order via WhatsApp
+</button>
+
+</div>
+
+<!-- QR PAYMENT POPUP -->
+
+<div id="paymentPopup">
+  <div style="background:white;padding:25px;border-radius:15px;text-align:center;width:300px;">
+
+```
+<h3>Scan & Pay</h3>
+<img id="qrImage" style="width:200px;margin:15px 0;">
+
+<p><b>Total: ₹<span id="payAmount"></span></b></p>
+
+<button onclick="confirmPayment()" style="padding:10px 15px;background:black;color:white;border:none;border-radius:8px;">
+  I Paid ✅
+  <p></p>⚠️ please take payment screenshot and upload on whatsapp
+</button>
+```
+
+  </div>
+</div>
+
+<script>
+
+function generateInputs() {
+    let count = document.getElementById("imgCount").value;
+    let container = document.getElementById("dynamicInputs");
+
+    container.innerHTML = "";
+
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+        <div style="margin-top:20px;padding:15px;border:1px solid #eee;border-radius:10px;">
+            <h4>Image ${i}</h4>
+
+            <input type="file" id="file${i}">
+
+            <select id="type${i}" onchange="updateSize(${i})">
+                <option value="">Select Type</option>
+                <option value="Polaroid">Polaroid</option>
+                <option value="Poster">Poster</option>
+            </select>
+
+            <select id="size${i}">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="qty${i}" placeholder="Quantity" min="1" value="1">
+        </div>`;
+    }
+}
+
+function updateSize(i) {
+    let type = document.getElementById(`type${i}`).value;
+    let sizeSelect = document.getElementById(`size${i}`);
+
+    if (type === "Polaroid") {
+        sizeSelect.innerHTML = `<option value="25">Polaroid - ₹25</option>`;
+    } else if (type === "Poster") {
+        sizeSelect.innerHTML = `
+            <option value="55">A6 - ₹35</option>
+            <option value="35">A5 - ₹40</option>
+            <option value="45">A4 - ₹50</option>
+            <option value="55">A3 - ₹60</option>`;
+    } else {
+        sizeSelect.innerHTML = `<option value="">Select Size</option>`;
+    }
+}
+
+async function submitForm() {
+
+    let btn = document.getElementById("submitBtn");
+    btn.innerText = "Processing...";
+    btn.disabled = true;
+
+    // 🔐 LOGIN CHECK
+    if (!currentUser) {
+        alert("Please login first");
+        loginUser();
+        resetBtn();
+        return;
+    }
+
+    let email = currentUser.email;
+
+    let count = document.getElementById("imgCount").value;
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+    let address = document.getElementById("address").value;
+    let note = document.getElementById("note").value;
+
+    if (!name || !phone || !address) {
+        alert("Please fill all details ⚠️");
+        resetBtn();
+        return;
+    }
+
+    let total = 0;
+    let totalQty = 0;
+    let details = "";
+
+    for (let i = 1; i <= count; i++) {
+
+        let type = document.getElementById(`type${i}`).value;
+        let size = document.getElementById(`size${i}`);
+        let price = size.value;
+        let sizeText = size.options[size.selectedIndex]?.text;
+        let qty = parseInt(document.getElementById(`qty${i}`).value);
+
+        if (!type || !price || !qty) {
+            alert(`Fill all fields for Image ${i}`);
+            resetBtn();
+            return;
+        }
+
+        totalQty += qty;
+        let itemTotal = parseInt(price) * qty;
+        total += itemTotal;
+
+        let fileInput = document.getElementById(`file${i}`);
+        let file = fileInput.files[0];
+
+        let imageUrl = "No image";
+
+        if (file) {
+            try {
+                let formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "jvm_uploads");
+
+                let res = await fetch("https://api.cloudinary.com/v1_1/dhbawoyak/image/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await res.json();
+
+                if (data.secure_url) {
+                    imageUrl = data.secure_url;
+                }
+
+            } catch (err) {
+                imageUrl = "Upload error";
+            }
+        }
+
+        details += `Image ${i}
+Type: ${type}
+${sizeText}
+Qty: ${qty}
+Total: ₹${itemTotal}
+
+Image Link:
+${imageUrl}
+
+`;
+    }
+
+    if (totalQty < 5) {
+        alert("Minimum 5 prints required ⚠️");
+        resetBtn();
+        return;
+    }
+
+    let message = `New Custom Order
+
+Email: ${email}
+Name: ${name}
+Phone: ${phone}
+Address: ${address}
+
+${details}
+Total Prints: ${totalQty}
+Grand Total: ₹${total}
+
+Note: ${note || "None"}
+Payment: UPI
+
+⚠️ Please verify uploaded images using above links`;
+
+    window.finalMessage = message;
+
+    document.getElementById("payAmount").innerText = total;
+
+    let upiLink = `upi://pay?pa=kmagesh901-1@okaxis&pn=JVM Polaroids&am=${total}&cu=INR`;
+    let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+
+    document.getElementById("qrImage").src = qrUrl;
+    document.getElementById("paymentPopup").style.display = "flex";
+
+    resetBtn();
+}
+
+function confirmPayment() {
+    let orderId = "JVM" + Math.floor(Math.random() * 100000);
+
+    let finalMsg = window.finalMessage + `
+
+Order ID: ${orderId}
+Payment Status: Paid (User Confirmed)
+⚠️ please add screenshot to evaluate your order`;
+
+    let encoded = encodeURIComponent(finalMsg);
+
+    window.open(`https://wa.me/919941155195?text=${encoded}`, '_blank');
+}
+
+function resetBtn() {
+    let btn = document.getElementById("submitBtn");
+    btn.innerText = "Submit Order via WhatsApp";
+    btn.disabled = false;
+}
+
+</script>
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA1i1pR_glUOeCU0juW8ChVYHYfliKxRGI",
+  authDomain: "jvm-polaroids.firebaseapp.com",
+  projectId: "jvm-polaroids",
+  storageBucket: "jvm-polaroids.firebasestorage.app",
+  messagingSenderId: "288751149491",
+  appId: "1:288751149491:web:7c9da5859929b5d342ebc6",
+  measurementId: "G-KKNE75QPMX"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+let currentUser = null;
+
+// AUTO LOGIN
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUser = user;
+        showProfile(user);
+    }
+});
+
+// LOGIN
+function loginUser() {
+    auth.signInWithPopup(provider);
+}
+
+// LOGOUT
+function logoutUser() {
+    auth.signOut();
+    location.reload();
+}
+
+// PROFILE UI
+function showProfile(user) {
+    let nav = document.querySelector(".navbar div:last-child");
+
+    let profile = document.createElement("div");
+    profile.style.marginLeft = "10px";
+    profile.style.cursor = "pointer";
+
+    profile.innerHTML = `
+        <div style="
+            width:30px;height:30px;border-radius:50%;
+            background:black;color:white;
+            display:flex;align-items:center;justify-content:center;
+            font-size:12px;">
+            ${user.email[0].toUpperCase()}
+        </div>
+
+        <div id="dropdown" style="
+            display:none;position:absolute;right:20px;top:60px;
+            background:white;padding:10px;border-radius:10px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.1);font-size:12px;">
+            
+            <p>${user.email}</p>
+            <button onclick="logoutUser()" style="
+                padding:5px 10px;border:none;background:black;
+                color:white;border-radius:6px;cursor:pointer;">
+                Logout
+            </button>
+        </div>
+    `;
+
+    profile.onclick = () => {
+        let d = document.getElementById("dropdown");
+        d.style.display = d.style.display === "block" ? "none" : "block";
+    };
+
+    nav.appendChild(profile);
+}
+</script>
+
+</body>
+</html>

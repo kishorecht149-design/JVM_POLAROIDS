@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre Printed Orders</title>
+
+<style>
+body {
+    font-family: Arial;
+    padding: 30px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+input, select {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 12px;
+    width: 100%;
+    background: black;
+    color: white;
+    border: none;
+}
+
+/* QR POPUP */
+#popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 60px;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar a {
+    margin: 0 12px;
+    text-decoration: none;
+    color: #444;
+}
+.login-btn {
+    padding: 6px 14px;
+    border: none;
+    background: black;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    
+}
+
+.navbar div:last-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+input, select, textarea {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 🔥 IMPORTANT */
+    padding: 18px 60px;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar div:last-child {
+    display: flex;
+    align-items: center; /* 🔥 KEY FIX */
+    gap: 15px;
+}
+/* FIX TEXTAREA HEIGHT + ALIGNMENT */
+textarea {
+    min-height: 80px;
+    resize: vertical;
+    .navbar div:last-child {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 🔥 MAKE EVERYTHING SAME BASE */
+.navbar a,
+.login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    font-size: 14px;
+}
+
+/* LINKS */
+.navbar a {
+    text-decoration: none;
+    color: #444;
+}
+
+/* BUTTON */
+.login-btn {
+    padding: 0 14px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    line-height: 1; /* 🔥 CRITICAL FIX */
+}
+}
+
+</style>
+
+</head>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script src="auth.js"></script>
+
+<body>
+    <div class="navbar">
+    <div>JVM Polaroids</div>
+    <div id="navRight">
+        <a href="index.html">Home</a>
+        <a href="anime.html">Polaroids</a>
+        <a href="custom.html">Custom</a>
+
+        <!-- 🔥 ADD THIS -->
+       <button id="loginBtn" onclick="loginUser()" class="login-btn">
+    Sign Up
+</button>
+    </div>
+</div>
+</div>
+
+<div class="container">
+
+<h2>Pre Printed Orders</h2>
+
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<textarea id="address" placeholder="Address" rows="3"></textarea>
+
+<input type="number" id="designCount" placeholder="How many designs?" onchange="generateDesigns()">
+
+<div id="designContainer"></div>
+
+<select id="payment">
+    <option value="">Select Payment</option>
+    <option value="COD">Cash on Delivery</option>
+    <option value="UPI">UPI Payment</option>
+</select>
+
+<button onclick="placeOrder()">Place Order</button>
+
+</div>
+
+<!-- QR -->
+<div id="popup">
+  <div class="popup-box">
+    <h3>Scan & Pay</h3>
+    <img id="qr" width="200">
+    <p>Amount: ₹<span id="amt"></span></p>
+    <button onclick="confirmPay()">✅ I Paid<p> ⚠️ Please take payment screenshot to upload on whatsapp</p></button>
+  </div>
+</div>
+
+<script>
+
+
+
+function generateDesigns() {
+    let count = document.getElementById("designCount").value;
+    let container = document.getElementById("designContainer");
+
+    container.innerHTML = "";
+
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+        <div style="margin-top:20px;padding:15px;border:1px solid #ddd;">
+            <h4>Design ${i}</h4>
+
+            <select id="type${i}" onchange="updateSize(${i})">
+                <option value="">Select Type</option>
+                <option value="Polaroid">Polaroid</option>
+                <option value="Poster">Poster</option>
+            </select>
+
+            <input id="serial${i}" placeholder="Serial No (ACT-101)">
+
+            <select id="size${i}">
+                <option value="">Select Size</option>
+            </select>
+
+            <input type="number" id="qty${i}" placeholder="Quantity">
+        </div>`;
+    }
+}
+
+function updateSize(i) {
+    let type = document.getElementById(`type${i}`).value;
+    let size = document.getElementById(`size${i}`);
+
+    if (type === "Polaroid") {
+        size.innerHTML = `<option value="25">Polaroid - ₹25</option>`;
+    } else if (type === "Poster") {
+        size.innerHTML = `
+            <option value="35">A6 - ₹30</option>
+            <option value="35">A5 - ₹30</option>
+            <option value="45">A4 - ₹45</option>
+            <option value="55">A3 - ₹55</option>`;
+    } else {
+        size.innerHTML = `<option value="">Select Size</option>`;
+    }
+}
+
+let finalMsg = "";
+let total = 0;
+
+function placeOrder() {
+
+    // 🔐 FORCE LOGIN (ONLY IF NOT LOGGED IN)
+  if (!window.currentUser) {
+    alert("Please login first");
+    loginUser();
+    return;
+}
+
+    let email = window.currentUser.email;
+
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+    let address = document.getElementById("address").value;
+    let count = document.getElementById("designCount").value;
+    let payment = document.getElementById("payment").value;
+
+    if (!name || !phone || !address || !count || !payment) {
+        alert("Fill all details");
+        return;
+    }
+
+    total = 0;
+    let totalQty = 0;
+    let details = "";
+
+    for (let i = 1; i <= count; i++) {
+
+        let type = document.getElementById(`type${i}`).value;
+        let serial = document.getElementById(`serial${i}`).value;
+        let size = document.getElementById(`size${i}`);
+        let price = size.value;
+        let sizeText = size.options[size.selectedIndex]?.text;
+        let qty = parseInt(document.getElementById(`qty${i}`).value);
+
+        if (!type || !serial || !price || !qty) {
+            alert(`Fill all fields in Design ${i}`);
+            return;
+        }
+
+        let itemTotal = price * qty;
+        total += itemTotal;
+        totalQty += qty;
+
+        details += `Design ${i}
+Type: ${type}
+Serial: ${serial}
+${sizeText}
+Qty: ${qty}
+Total: ₹${itemTotal}
+
+`;
+    }
+
+    if (totalQty < 2) {
+        alert("Minimum 2 prints required");
+        return;
+    }
+
+    // 🔥 EMAIL ADDED HERE
+    finalMsg = `Pre Printed Order
+
+Email: ${email}
+Name: ${name}
+Phone: ${phone}
+Address: ${address}
+
+${details}
+Total Prints: ${totalQty}
+Grand Total: ₹${total}
+
+Payment: ${payment}`;
+
+    if (payment === "COD") {
+        sendWhatsApp(finalMsg);
+    }
+
+    if (payment === "UPI") {
+        showQR(total);
+    }
+}
+
+function showQR(amount) {
+    document.getElementById("amt").innerText = amount;
+
+    let upi = `upi://pay?pa=kmagesh901-1@okaxis&pn=JVM&am=${amount}&cu=INR`;
+    let qr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upi)}`;
+
+    document.getElementById("qr").src = qr;
+    document.getElementById("popup").style.display = "flex";
+}
+
+function confirmPay() {
+    let orderId = "JVM" + Math.floor(Math.random() * 100000);
+
+    let msg = finalMsg + `
+
+Order ID: ${orderId}
+Payment: Paid (User Confirmed)
+
+⚠️ please add screenshot to evaluate your order`;
+
+    sendWhatsApp(msg);
+}
+
+function sendWhatsApp(msg) {
+    window.open(`https://wa.me/919941155195?text=${encodeURIComponent(msg)}`);
+}
+
+</script>
+
+</body>
+</html>
