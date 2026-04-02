@@ -290,6 +290,57 @@ html {
         font-size: 13px;
     }
 }
+    @media (max-width: 768px) {
+
+    /* ===== CENTER ALL BUTTONS ===== */
+    .hero-buttons a,
+    .collection a {
+        display: block;
+        width: 100%;
+        max-width: 320px;
+        margin: 12px auto;
+        text-align: center;
+    }
+
+    /* ===== FIX COLLECTION BUTTON (YOUR MAIN ISSUE) ===== */
+    .collection {
+        text-align: center;
+        padding: 30px 16px;
+    }
+
+    .collection a {
+        margin: 20px auto 0 auto;
+    }
+
+    /* ===== FIX HERO ALIGNMENT ===== */
+    .hero {
+        text-align: center;
+        padding: 20px 16px;
+    }
+
+    .hero-img img {
+        display: block;
+        margin: 20px auto;
+        width: 180px;
+    }
+
+    /* ===== FIX WHATSAPP OVERLAP ===== */
+    .whatsapp {
+        bottom: 80px;
+        right: 15px;
+    }
+
+    body {
+        padding-bottom: 120px;
+    }
+
+    /* ===== FIX CATEGORY SPACING ===== */
+    .category-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px;
+        gap: 16px;
+    }
+}
 </style>
 
 
