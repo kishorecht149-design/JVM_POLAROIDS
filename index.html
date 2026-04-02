@@ -299,106 +299,103 @@ html {
     align-items: center;
     gap: 12px;
 }
-/* ========================= */
-/* 📱 MOBILE RESPONSIVE FIX */
-/* ========================= */
-
 @media (max-width: 768px) {
+
+    /* 🔥 GLOBAL PADDING FIX */
+    body {
+        overflow-x: hidden;
+    }
 
     /* NAVBAR */
     .navbar {
-        padding: 12px 15px;
+        padding: 12px 15px !important;
         flex-wrap: wrap;
     }
 
     .navbar div:last-child {
         display: flex;
-        align-items: center;
-        gap: 8px;
         flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
     }
 
-    .navbar a {
-        font-size: 13px;
-    }
-
-    .login-btn {
-        padding: 5px 10px;
+    .navbar a, 
+    .login-btn,
+    .navbar button {
         font-size: 12px;
-        height: 30px;
+        padding: 6px 10px;
     }
 
     /* HERO SECTION */
     .hero {
-        display: flex;
         flex-direction: column;
+        padding: 30px 15px !important;
         text-align: center;
-        padding: 20px;
     }
 
     .hero h1 {
-        font-size: 28px;
+        font-size: 26px !important;
     }
 
-    .hero p {
-        font-size: 14px;
-    }
-
-    .hero img {
-        width: 200px;
+    .hero-img img {
+        width: 220px !important;
+        max-width: 100% !important;
         margin-top: 20px;
     }
 
-    /* BUTTONS FIX (VERY IMPORTANT) */
-    .hero-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 15px;
+    /* CATEGORY + GRID */
+    .categories,
+    .grid,
+    .title {
+        padding: 20px 15px !important;
     }
 
-    .hero-buttons a {
-        width: 100%;
-        text-align: center;
-        padding: 12px;
-        font-size: 14px;
-    }
-
-    /* GRID FIX */
     .grid {
-        grid-template-columns: 1fr;
-        padding: 20px;
-        gap: 20px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
     }
 
     .card {
-        padding: 20px;
-        text-align: center;
+        padding: 10px !important;
     }
 
-    /* FORM FIX */
+    .card h3 {
+        font-size: 14px;
+    }
+
+    /* POPUP */
+    .popup-content {
+        width: 90% !important;
+        padding: 20px !important;
+    }
+
+    .popup img {
+        height: 180px !important;
+    }
+
+    /* BUTTONS */
+    .btn {
+        width: 100% !important;
+        font-size: 14px !important;
+    }
+
+    /* FORM (CUSTOM + PREPRINTED) */
     .container {
-        margin: 20px;
-        padding: 20px;
+        margin: 20px 10px !important;
+        padding: 15px !important;
     }
 
     input, select, textarea {
-        font-size: 14px;
-        padding: 12px;
+        font-size: 14px !important;
+        padding: 10px !important;
     }
 
-    /* WHATSAPP FIX */
+    /* WHATSAPP BUTTON */
     .whatsapp {
-        bottom: 15px;
-        right: 15px;
-        padding: 10px 14px;
-        font-size: 14px;
-        border-radius: 30px;
-    }
-
-    /* PREVENT OVERLAP */
-    body {
-        padding-bottom: 80px;
+        right: 10px !important;
+        bottom: 15px !important;
+        padding: 10px 14px !important;
+        font-size: 13px !important;
     }
 }
 </style>
