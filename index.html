@@ -299,77 +299,107 @@ html {
     align-items: center;
     gap: 12px;
 }
+/* ========================= */
+/* 📱 MOBILE RESPONSIVE FIX */
+/* ========================= */
+
 @media (max-width: 768px) {
 
-  /* HERO STACK */
-  .hero {
-    flex-direction: column !important;
-    text-align: center !important;
-    padding: 24px 16px !important;
-  }
+    /* NAVBAR */
+    .navbar {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+    }
 
-  .hero-img img {
-    width: 220px !important;
-    margin: 20px auto 0 !important;
-    display: block !important;
-  }
+    .navbar div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
 
-  /* HERO BUTTONS (CENTER + FIX WIDTH) */
-  .hero a {
-    display: block !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    margin: 10px auto !important;
-    text-align: center !important;
-  }
+    .navbar a {
+        font-size: 13px;
+    }
 
-  /* COLLECTION BUTTON (FIX BROKEN ONE) */
-  .serial-box {
-    margin: 40px 16px !important;
-    padding: 24px 16px !important;
-    text-align: center !important;
-  }
+    .login-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+        height: 30px;
+    }
 
-  .serial-box a {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    margin: 16px auto !important;
-    padding: 14px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-  }
+    /* HERO SECTION */
+    .hero {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
 
-  /* CATEGORY GRID */
-  .category-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-    padding: 0 16px !important;
-  }
+    .hero h1 {
+        font-size: 28px;
+    }
 
-  /* NAVBAR */
-  .navbar {
-    padding: 12px 16px !important;
-  }
+    .hero p {
+        font-size: 14px;
+    }
 
-  .navbar div:last-child {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-  }
+    .hero img {
+        width: 200px;
+        margin-top: 20px;
+    }
 
-  /* WHATSAPP (NO OVERLAP) */
-  .whatsapp {
-    right: 16px !important;
-    bottom: 16px !important;
-  }
+    /* BUTTONS FIX (VERY IMPORTANT) */
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
 
-  body {
-    padding-bottom: 80px !important;
-  }
+    .hero-buttons a {
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* GRID FIX */
+    .grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .card {
+        padding: 20px;
+        text-align: center;
+    }
+
+    /* FORM FIX */
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    input, select, textarea {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    /* WHATSAPP FIX */
+    .whatsapp {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 30px;
+    }
+
+    /* PREVENT OVERLAP */
+    body {
+        padding-bottom: 80px;
+    }
 }
 </style>
 
