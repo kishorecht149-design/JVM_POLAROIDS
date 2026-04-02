@@ -341,35 +341,24 @@ html {
         gap: 16px;
     }
 }
-    @media (max-width: 768px) {
 
-/* ===== FIX ALL BUTTONS PROPERLY ===== */
+@media (max-width: 768px) {
 
-.btn,
-.hero-buttons a,
-.collection a {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
+    /* 🔥 FORCE FIX COLLECTION BUTTON */
+    .collection a {
+        display: block !important;
+        width: 90% !important;
+        max-width: 320px !important;
+        margin: 20px auto !important;
+        padding: 14px !important;
+        text-align: center !important;
+        background: black !important;
+        color: white !important;
+        border-radius: 14px !important;
+        text-decoration: none !important;
+    }
 
-    width: 100%;
-    max-width: 320px;
-
-    margin: 15px auto;
-
-    padding: 14px 18px;
-
-    background: black;
-    color: white;
-    text-decoration: none;
-
-    border-radius: 14px;
-    font-size: 15px;
-
-    white-space: nowrap; /* 🔥 prevents breaking */
 }
-</style>
-
 
 </head>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
